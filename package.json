@@ -1,21 +1,15 @@
 {
-  "name": "clockboard",
+  "name": "clockboard-monorepo",
   "private": true,
-  "version": "1.0.0",
-  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "@base-ui/react": "^1.3.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-router-dom": "^6.22.3"
-  },
-  "devDependencies": {
-    "@vitejs/plugin-react": "^4.3.1",
-    "vite": "^5.4.2"
+    "dev": "npm run dev -w @clockboard/web",
+    "build": "npm run build -w @clockboard/web",
+    "preview": "npm run preview -w @clockboard/web",
+    "mobile": "npm run start -w @clockboard/mobile",
+    "test": "npm test -w @clockboard/shared"
   }
 }

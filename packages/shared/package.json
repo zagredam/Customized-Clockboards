@@ -1,0 +1,19 @@
+{
+  "name": "@clockboard/shared",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Platform-agnostic ClockBoard logic shared by the web and mobile apps (no React, no DOM).",
+  "type": "module",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./teams": "./src/teams.js",
+    "./timers": "./src/timers.js",
+    "./time": "./src/time.js",
+    "./drift": "./src/drift.js",
+    "./api": "./src/api.js"
+  },
+  "scripts": {
+    "test": "node --test"
+  }
+}

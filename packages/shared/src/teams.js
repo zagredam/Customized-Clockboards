@@ -35,3 +35,14 @@ export const TEAMS = [
   { id: 'TEN',  label: 'Tennessee Titans',           primaryColor: '#002244',          secondaryColor: '#4B92DB',  tertiaryColor: '#C60C30' },
   { id: 'WAS',  label: 'Washington Commanders',      primaryColor: '#5A1414',          secondaryColor: '#FFB612',  tertiaryColor: '#FFFFFF' },
 ]
+
+/** Resolve a theme id to { primaryColor, secondaryColor, ... }, swapping colors when `alt` is set. */
+export function resolveTheme(themeId, { alt = false, customThemes = [] } = {}) {
+  const found = [...TEAMS, ...customThemes].find(t => t.id === themeId) ?? {}
+  const theme = { ...found }
+  if (alt) {
+    theme.primaryColor = found.secondaryColor
+    theme.secondaryColor = found.primaryColor
+  }
+  return theme
+}

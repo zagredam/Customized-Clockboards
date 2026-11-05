@@ -1,6 +1,6 @@
 # ClockBoard
 
-> A React + Vite web app that shows the current time in five distinctive visual styles with integrated multi-timer and stopwatch support.
+> A React + Vite web app (plus an Expo/React Native mobile app in progress) that shows the current time in five distinctive visual styles with integrated multi-timer and stopwatch support.
 
 ## What it does
 
@@ -25,6 +25,8 @@ Alongside the clock, users can create and run multiple countdown timers (with la
 - FontAwesome 5 for icons
 
 ## Source layout
+
+npm-workspaces monorepo: `apps/web` (this web app), `apps/mobile` (Expo / React Native), `packages/shared` (platform-agnostic logic: themes, timer/stopwatch state, date helpers, drift, API client). Paths below are relative to `apps/web`.
 
 ```
 src/
@@ -97,7 +99,7 @@ Themes are applied by setting CSS custom properties on `:root`:
 
 The `altTheme` flag swaps `--primary` and `--secondary`. Users can also create fully custom themes by picking arbitrary colors.
 
-NFL team themes are defined in `src/data/teams.js` as `{ name, primary, secondary }` objects for all 32 teams.
+NFL team themes are defined in `packages/shared/src/teams.js` as `{ id, label, primaryColor, secondaryColor }` objects for all 32 teams.
 
 ## Notable implementation details
 

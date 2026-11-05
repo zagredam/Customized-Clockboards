@@ -1,17 +1,9 @@
+import { getTimerSecondsLeft, splitDuration } from '@clockboard/shared/timers'
+
 export default function Timer({ timer, tick, showControls, onClose, onReset, onToggle }) {
-  const diffInSeconds = timer.paused
-    ? (timer.timeLeft || 0)
-    : (timer.timeToExp - Date.now()) / 1000
-
+  const diffInSeconds = getTimerSecondsLeft(timer)
   const expired = diffInSeconds < 0
-
-  const hours = expired ? 0 : Math.floor(diffInSeconds / 3600)
-  const minutes = expired ? 0 : Math.floor((diffInSeconds % 3600) / 60)
-  const seconds = expired ? 0 : Math.floor(diffInSeconds % 60)
-
-  const hoursStr = hours > 0 ? `${hours}:` : ''
-  const minutesStr = `${minutes < 10 ? '0' : ''}${minutes}:`
-  const secondsStr = seconds < 10 ? `0${seconds}` : `${seconds}`
+  const { hoursStr, minutesStr, secondsStr } = splitDuration(diffInSeconds)
 
   return (
     <div className="timer">

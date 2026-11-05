@@ -1,4 +1,5 @@
 import { createContext, useContext, useState } from 'react'
+import { createApiClient } from '@clockboard/shared/api'
 
 const ServerContext = createContext(null)
 
@@ -23,22 +24,7 @@ export function ServerProvider({ children }) {
   const setServerUrl = (v) => { setServerUrlRaw(v); saveStorage('cb_serverUrl', v) }
   const setServerHeaders = (v) => { setServerHeadersRaw(v); saveStorage('cb_serverHeaders', v) }
 
-  const serverRequest = async (method, path, body) => {
-    if (!isConnected) return null
-    const headers = { 'Content-Type': 'application/json' }
-    serverHeaders.forEach(h => {
-      if (h.key && h.key.trim()) headers[h.key.trim()] = h.value
-    })
-    const url = serverUrl.replace(/\/$/, '') + path
-    const res = await fetch(url, {
-      method,
-      headers,
-      body: body !== undefined ? JSON.stringify(body) : undefined,
-    })
-    if (!res.ok) throw new Error(`Server responded with ${res.status}`)
-    const text = await res.text()
-    return text ? JSON.parse(text) : null
-  }
+  const serverRequest = createApiClient({ baseUrl: serverUrl, headers: serverHeaders }).request
 
   return (
     <ServerContext.Provider value={{

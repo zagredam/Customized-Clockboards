@@ -1,5 +1,9 @@
 import { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react'
 import { useServerContext } from './ServerContext'
+import {
+  parseTimerDuration, createTimer, resetTimer as resetTimerState, toggleTimer as toggleTimerState,
+  createStopwatch, resetStopwatch as resetStopwatchState, toggleStopwatch as toggleStopwatchState,
+} from '@clockboard/shared/timers'
 
 const AppContext = createContext(null)
 
@@ -92,10 +96,10 @@ export function AppProvider({ children }) {
 
   // ── Timer handlers ──────────────────────────────────────────
   const addTimer = useCallback(async (minutes, seconds, label) => {
-    if ((minutes === '' && seconds === '') || isNaN(minutes) || isNaN(seconds)) return
-    const timerValue = 60000 * (Number(minutes) || 0) + 1000 * (Number(seconds) || 0)
+    const timerValue = parseTimerDuration(minutes, seconds)
+    if (timerValue === null) return
     if (isConnected) {
-      const body = { label, timerValue, timeToExp: Date.now() + timerValue, paused: false, timeLeft: null }
+      const body = createTimer({ label, timerValue })
       try {
         const result = await serverRequest('POST', '/timers', body)
         const id = result?.id ?? _idCounter++
@@ -106,7 +110,7 @@ export function AppProvider({ children }) {
     } else {
       setTimers(prev => [
         ...prev,
-        { id: _idCounter++, label, timerValue, timeToExp: Date.now() + timerValue, paused: false, timeLeft: null },
+        createTimer({ id: _idCounter++, label, timerValue }),
       ])
     }
   }, [isConnected, serverRequest])
@@ -118,7 +122,7 @@ export function AppProvider({ children }) {
 
   const resetTimer = useCallback((id) => {
     setTimers(prev => prev.map(t =>
-      t.id === id ? { ...t, timeToExp: Date.now() + t.timerValue, paused: false, timeLeft: null } : t
+      t.id === id ? resetTimerState(t) : t
     ))
   }, [])
 
@@ -127,17 +131,17 @@ export function AppProvider({ children }) {
       if (t.id !== id) return t
       if (!t.paused) {
         if (isConnected) serverRequest('POST', `/timers/pause/${id}`).catch(err => console.error('Failed to pause timer:', err))
-        return { ...t, paused: true, timeLeft: (t.timeToExp - Date.now()) / 1000 }
+      } else if (isConnected) {
+        serverRequest('POST', `/timers/restart/${id}`).catch(err => console.error('Failed to restart timer:', err))
       }
-      if (isConnected) serverRequest('POST', `/timers/restart/${id}`).catch(err => console.error('Failed to restart timer:', err))
-      return { ...t, paused: false, timeToExp: Date.now() + t.timeLeft * 1000, timeLeft: null }
+      return toggleTimerState(t)
     }))
   }, [isConnected, serverRequest])
 
   // ── Stopwatch handlers ──────────────────────────────────────
   const addStopwatch = useCallback(async (label, startTime) => {
     if (isConnected) {
-      const body = { label, paused: false, markedTime: startTime ?? Date.now(), pausedDiff: 0 }
+      const body = createStopwatch({ label, startTime })
       try {
         const result = await serverRequest('POST', '/stopwatches', body)
         const id = result?.id ?? _idCounter++
@@ -148,7 +152,7 @@ export function AppProvider({ children }) {
     } else {
       setStopwatches(prev => [
         ...prev,
-        { id: _idCounter++, label, paused: false, markedTime: startTime ?? Date.now(), pausedDiff: 0 },
+        createStopwatch({ id: _idCounter++, label, startTime }),
       ])
     }
   }, [isConnected, serverRequest])
@@ -160,7 +164,7 @@ export function AppProvider({ children }) {
 
   const resetStopwatch = useCallback((id) => {
     setStopwatches(prev => prev.map(sw =>
-      sw.id === id ? { ...sw, markedTime: Date.now(), pausedDiff: 0 } : sw
+      sw.id === id ? resetStopwatchState(sw) : sw
     ))
   }, [])
 
@@ -169,10 +173,10 @@ export function AppProvider({ children }) {
       if (sw.id !== id) return sw
       if (!sw.paused) {
         if (isConnected) serverRequest('POST', `/stopwatches/pause/${id}`).catch(err => console.error('Failed to pause stopwatch:', err))
-        return { ...sw, paused: true, pausedDiff: Date.now() - sw.markedTime + sw.pausedDiff }
+      } else if (isConnected) {
+        serverRequest('POST', `/stopwatches/restart/${id}`).catch(err => console.error('Failed to restart stopwatch:', err))
       }
-      if (isConnected) serverRequest('POST', `/stopwatches/restart/${id}`).catch(err => console.error('Failed to restart stopwatch:', err))
-      return { ...sw, paused: false, markedTime: Date.now() }
+      return toggleStopwatchState(sw)
     }))
   }, [isConnected, serverRequest])
 

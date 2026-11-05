@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react'
-import { TEAMS } from '../data/teams'
+import { TEAMS, resolveTheme } from '@clockboard/shared/teams'
 
 
 const defaults = {
@@ -36,13 +36,7 @@ export function SettingsProvider({ children }) {
   const [showDate, setShowDateRaw] = useState(() => load('showDate'))
   const [hourglassInterval, setHourglassIntervalRaw] = useState(() => load('hourglassInterval'))
   const themeOptions = [...TEAMS,...customThemes];
-  let themeValues = {...(themeOptions.find(t => t.id === theme) )};
-  if(altTheme){
-    //swap primaryColor and secondaryColor properties of themeValues
-    const tempColor = themeValues.primaryColor;
-    themeValues.primaryColor = themeValues.secondaryColor;
-    themeValues.secondaryColor = tempColor;
-  }
+  const themeValues = resolveTheme(theme, { alt: altTheme, customThemes });
   useEffect(() => {
     const classes = [theme !== 'None' ? theme : '', altTheme ? 'alt' : ''].filter(Boolean)
     document.body.className = classes.join(' ')
