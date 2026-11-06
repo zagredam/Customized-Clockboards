@@ -11,5 +11,8 @@
     "preview": "npm run preview -w @clockboard/web",
     "mobile": "npm run start -w @clockboard/mobile",
     "test": "npm test -w @clockboard/shared"
+  },
+  "engines": {
+    "node": "^22.13.0 || ^24.3.0 || >=26.0.0"
   }
 }

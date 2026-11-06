@@ -15,7 +15,7 @@ A full-screen clock app with five visual styles, multi-timer support, and 32 NFL
 
 ## Getting Started
 
-**Requirements:** Node.js 20+
+**Requirements:** Node.js 22.13+ (or 24.3+) — required by Expo SDK 58 / React Native 0.88. Run `nvm use` to pick up `.nvmrc`.
 
 ```bash
 npm install       # once, at the repo root (npm workspaces)
